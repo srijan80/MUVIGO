@@ -9,7 +9,7 @@ const InputBox = ({ onSearch }) => {
 
   const handleSearchClick = () => {
     if (inputText.trim()) {
-      onSearch(inputText); //send search text to moviepage
+      onSearch(inputText); //send search text to moviepage,musicpage,gamepage
       setInputText(''); 
     }
   };

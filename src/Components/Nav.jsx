@@ -6,6 +6,7 @@ export const Nav = () => {
         <img src="...." alt="Logo" className="h-8" />
         <div className="text-center flex-grow">
           MUVIGO
+        <p className="text-lg mt-2">Find similar movies,music and game based on your search!</p>
         </div>
       </div>
     </>
