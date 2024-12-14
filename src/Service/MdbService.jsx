@@ -3,52 +3,49 @@ import axios from 'axios';
 const API_KEY = '31546f9b0e671832ecdaa48be1889ed7';
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-// Search for a movie based on title
+// Search for a movie by title
 export const searchMovie = async (movieTitle) => {
   try {
     const response = await axios.get(`${BASE_URL}/search/movie`, {
       params: {
         api_key: API_KEY,
         query: movieTitle,
-        language: 'en-US', // Ensure the search is in English
-        page: 1, // Ensure you're searching the first page of results
-      }
+        language: 'en-US',
+        page: 1,
+      },
     });
 
-    // Check if there are any results
-    if (response.data.results.length > 0) {
+    if (response.data.results && response.data.results.length > 0) {
       return response.data.results[0]; // Return the first result
     } else {
-      console.error('No movie found for title:', movieTitle);
+      console.warn(`No movie found for title: "${movieTitle}"`);
       return null;
     }
   } catch (error) {
-    console.error('Error searching movie:', error);
-    return null;
+    console.error('Error searching for movie:', error.message);
+    throw error; // Rethrow error to be handled by calling function
   }
 };
 
-// Get movie recommendations based on movie ID
+// Get movie recommendations by movie ID
 export const getMovieRecommendations = async (movieId) => {
   try {
     const response = await axios.get(`${BASE_URL}/movie/${movieId}/recommendations`, {
       params: {
         api_key: API_KEY,
-        language: 'en-US', // Ensure the recommendations are in English
-        page: 1, // Get the first page of recommendations
-      }
+        language: 'en-US',
+        page: 1,
+      },
     });
 
-    // Check if recommendations exist
     if (response.data.results && response.data.results.length > 0) {
-      // Return first 4 recommendations
-      return response.data.results.slice(0, 4); 
+      return response.data.results.slice(0, 4); // Return the first 4 recommendations
     } else {
-      console.error('No recommendations found for movie ID:', movieId);
+      console.warn(`No recommendations found for movie ID: ${movieId}`);
       return [];
     }
   } catch (error) {
-    console.error('Error getting recommendations:', error);
-    return [];
+    console.error('Error fetching recommendations:', error.message);
+    throw error; // Rethrow error to be handled by calling function
   }
 };
