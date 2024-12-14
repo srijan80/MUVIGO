@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import InputBox from '../Components/InputBox'; 
-import { searchMovie, getMovieRecommendations } from '../Service/MdbService'; // Import API functions
+import { searchMovie, getMovieRecommendations } from '../Service/MdbService'; 
 
 export const Movie = () => {
   const [searchText, setSearchText] = useState('');
@@ -10,7 +10,7 @@ export const Movie = () => {
     setSearchText(inputText);
 
     try {
-      const movie = await searchMovie(inputText);
+      const movie = await searchMovie(inputText); //send search text to api service
       if (movie) {
         console.log(`Movie found: ${movie.title} (ID: ${movie.id})`);
         const recommendations = await getMovieRecommendations(movie.id);

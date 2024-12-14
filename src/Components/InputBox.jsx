@@ -9,7 +9,7 @@ const InputBox = ({ onSearch }) => {
 
   const handleSearchClick = () => {
     if (inputText.trim()) {
-      onSearch(inputText); 
+      onSearch(inputText); //send search text to moviepage
       setInputText(''); 
     }
   };
@@ -19,12 +19,12 @@ const InputBox = ({ onSearch }) => {
       <input
         className="rounded-lg p-2 w-64 text-black border border-gray-300 focus:outline-none focus:ring-0"
         type="text"
-        placeholder="Enter a movie name"
+        placeholder="Type to Search"
         value={inputText}
-        onChange={handleInputChange} // Update input text as user types
+        onChange={handleInputChange} 
       />
       <button
-        onClick={handleSearchClick} // Trigger search on button click
+        onClick={handleSearchClick} 
         className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition"
       >
         Search
