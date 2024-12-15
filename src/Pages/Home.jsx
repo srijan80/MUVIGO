@@ -19,7 +19,7 @@ function Home() {
   return (
     <>
       <Nav />
-      <div className="flex items-center justify-center h-[calc(90vh-20px)] w-auto overflow-hidden">
+      <div className="flex items-center justify-center h-[calc(85vh-26px)] w-auto overflow-hidden">
         <div className="text-center flex flex-col items-center ">
           <div className="flex gap-4">
             <button 

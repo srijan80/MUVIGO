@@ -8,5 +8,4 @@ function Button({ children, onClick, className = '' }) {
       </button>
     );
   }
-  
   export default Button;
