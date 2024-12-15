@@ -28,7 +28,7 @@ export const Game = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="bg-black p-6 text-center text-3xl font-semibold">
-        <h1>Welcome to GameSuggest</h1>
+        <h1>Welcome to Muvigo</h1>
         <p className="text-lg mt-2">Find similar games based on your search!</p>
       </div>
       <div className="flex justify-center p-4">
