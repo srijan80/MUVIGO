@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import InputBox from '../Components/InputBox'; 
+import { useNavigate } from 'react-router-dom';
+import Button from '../Components/Button';
 import { searchMovie, getMovieRecommendations } from '../Service/MdbService'; 
 
 export const Movie = () => {
+  const navigate = useNavigate(); 
   const [searchText, setSearchText] = useState('');
   const [similarMovies, setSimilarMovies] = useState([]);
 
@@ -32,8 +35,9 @@ export const Movie = () => {
         <h1>Welcome to Muvigo</h1>
         <p className="text-lg mt-2">Find similar movies based on your search!</p>
       </div>
-      <div className="flex justify-center p-4">
+      <div className="flex justify-center p-4 gap-3">
         <InputBox onSearch={handleSearch} />
+        <Button onClick={() => navigate('/movies/curd')}>Movies Dashboard</Button>
       </div>
       {searchText && (
         <div className="text-center text-white mt-2">
