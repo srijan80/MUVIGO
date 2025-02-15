@@ -17,7 +17,7 @@ const Search = () => {
     'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMTU0NmY5YjBlNjcxODMyZWNkYWE0OGJlMTg4OWVkNyIsInN1YiI6IjY3NTk5YzA2ZGEzYmQzOWI4Nzg2MGU4ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Gck1ZvDLYbZbLhSHC5XNChFBjs_MMhClS8wBDz-bbGo';
 
   const fetchMovies = async () => {
-    if (!query) return; // Don't search if query is empty
+    if (!query) return; 
     setLoading(true);
     setError(null);
 
@@ -51,22 +51,9 @@ const Search = () => {
     fetchMovies();
   };
 
-  const toggleFavorite = (movie) => {
-    const isFavorite = favorites.some(fav => fav.id === movie.id); // Check if the movie is already a favorite
-    let updatedFavorites;
-
-    if (isFavorite) {
-      updatedFavorites = favorites.filter((fav) => fav.id !== movie.id); // Remove movie from favorites
-    } else {
-      updatedFavorites = [...favorites, movie]; // Add the entire movie object to favorites
-    }
-
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites)); // Save updated favorites to localStorage
-  };
 
   const isFavorite = (movie) => {
-    return favorites.some(fav => fav.id === movie.id); // Check if the movie is in favorites
+    return favorites.some(fav => fav.id === movie.id); 
   };
 
   return (

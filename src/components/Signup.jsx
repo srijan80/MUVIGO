@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth } from "./firebase";  // Import Firebase auth
+import { auth } from "./firebase"; 
 
 function Signup({ onSuccess }) {
   const [email, setEmail] = useState("");
@@ -10,7 +10,7 @@ function Signup({ onSuccess }) {
     e.preventDefault();
     try {
       await auth.createUserWithEmailAndPassword(email, password);
-      onSuccess(); // Call the success handler to close the modal and navigate to moviego
+      onSuccess(); 
     } catch (err) {
       setError(err.message);
     }

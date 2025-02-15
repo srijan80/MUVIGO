@@ -66,7 +66,7 @@ export default function Movie() {
   const ACCESS_TOKEN =
     "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMTU0NmY5YjBlNjcxODMyZWNkYWE0OGJlMTg4OWVkNyIsInN1YiI6IjY3NTk5YzA2ZGEzYmQzOWI4Nzg2MGU4ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Gck1ZvDLYbZbLhSHC5XNChFBjs_MMhClS8wBDz-bbGo";
 
-  // Check for authentication on component mount
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -147,7 +147,7 @@ export default function Movie() {
     if (isFavorite) {
       updatedFavorites = storedFavorites.filter((fav) => fav.id !== movie.id);
     } else {
-      updatedFavorites = [...storedFavorites, movie]; // Store the full movie object
+      updatedFavorites = [...storedFavorites, movie];  
     }
 
     localStorage.setItem("favoriteMovies", JSON.stringify(updatedFavorites));

@@ -10,7 +10,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   
-// Add this to your Login component
+
 useEffect(() => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -18,11 +18,10 @@ useEffect(() => {
   }
 }, [navigate]);
 
-  // Check if user is already logged in
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // If token exists, redirect to movie page
       navigate('/movie');
     }
   }, [navigate]);
@@ -32,7 +31,7 @@ useEffect(() => {
     setError('');
     setIsLoading(true);
 
-    // Basic validation
+   
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
       setIsLoading(false);
@@ -46,17 +45,15 @@ useEffect(() => {
         password,
       });
 
-      // Store token
+    
       localStorage.setItem('token', response.data.token);
       
-      // Set authorization header for future requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       
-      // Clear form
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+ 
       setEmail('');
       setPassword('');
-      
-      // Redirect to movies page
+ 
       navigate('/movie');
     } catch (error) {
       setError(

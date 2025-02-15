@@ -4,8 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import Login from './components/Login';
-import MoviePage from './components/Movie';  // Add this import
-import ProtectedRoute from './components/ProtectedRoute';  // Add this import
+import MoviePage from './components/Movie'; 
+import ProtectedRoute from './components/ProtectedRoute';  
 import Fav from './components/Fav';
 import Search from './components/Search';
 

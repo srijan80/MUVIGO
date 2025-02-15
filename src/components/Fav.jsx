@@ -8,7 +8,7 @@ export default function Fav() {
 
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem("favoriteMovies")) || [];
-    console.log("Stored Favorites in useEffect:", storedFavorites); // Debugging line
+    console.log("Stored Favorites in useEffect:", storedFavorites); 
     setFavoriteMovies(storedFavorites);
   }, []);
 
@@ -21,7 +21,7 @@ export default function Fav() {
   const handleUnbookmark = (movieId) => {
     const updatedFavorites = favoriteMovies.filter((movie) => movie.id !== movieId);
     setFavoriteMovies(updatedFavorites);
-    localStorage.setItem("favoriteMovies", JSON.stringify(updatedFavorites)); // Save updated favorites to localStorage
+    localStorage.setItem("favoriteMovies", JSON.stringify(updatedFavorites)); 
   };
 
   return (
@@ -45,7 +45,7 @@ export default function Fav() {
                 key={movie.id}
                 className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
               >
-                {/* Movie Poster */}
+                
                 <div className="relative">
                   <img
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -57,24 +57,24 @@ export default function Fav() {
                   />
                 </div>
 
-                {/* Movie Info */}
+                
                 <div className="p-4">
                   <h3 className="text-xl font-bold text-white mb-2">{movie.title}</h3>
 
-                  {/* Release Date & Rating */}
+                  
                   <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
                     <span>📅 {movie.release_date}</span>
                     <span>⭐ {movie.vote_average.toFixed(1)}</span>
                   </div>
 
-                  {/* Movie Description */}
+                 
                   <p className="text-gray-400 text-sm mb-4 line-clamp-2">
                     {movie.overview.length > 100 ? movie.overview.substring(0, 100) + "..." : movie.overview}
                   </p>
 
-                  {/* Action Buttons */}
+                 
                   <div className="flex gap-2">
-                    {/* Watch Now Button */}
+                   
                     <button
                       onClick={() => handleWatchNow(movie.id)}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
@@ -97,7 +97,7 @@ export default function Fav() {
                       Watch Now
                     </button>
 
-                    {/* Unbookmark Button */}
+                   
                     <button
                       onClick={() => handleUnbookmark(movie.id)}
                       className="p-2 rounded-full hover:bg-gray-700/50 transition-colors"
