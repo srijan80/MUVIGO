@@ -1,23 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Mic, MicOff } from 'lucide-react';
 
 const Search = () => {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [favorites, setFavorites] = useState(
-    JSON.parse(localStorage.getItem('favorites')) || []
-  );
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
   const navigate = useNavigate();
 
   const API_KEY = '31546f9b0e671832ecdaa48be1889ed7';
   const ACCESS_TOKEN =
     'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMTU0NmY5YjBlNjcxODMyZWNkYWE0OGJlMTg4OWVkNyIsInN1YiI6IjY3NTk5YzA2ZGEzYmQzOWI4Nzg2MGU4ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Gck1ZvDLYbZbLhSHC5XNChFBjs_MMhClS8wBDz-bbGo';
 
-  const fetchMovies = async () => {
-    if (!query) return; 
+  useEffect(() => {
+    const initializeSpeechRecognition = async () => {
+      try {
+        // Try to load the polyfill if native speech recognition is not available
+        if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+          await import('https://cdnjs.cloudflare.com/ajax/libs/speech-recognition-polyfill/0.5.0/speech-recognition-polyfill.min.js');
+        }
+
+        // Get the appropriate speech recognition constructor
+        const SpeechRecognition = 
+          window.SpeechRecognition || 
+          window.webkitSpeechRecognition || 
+          window.SpeechRecognitionPolyfill;
+
+        if (SpeechRecognition) {
+          const recognitionInstance = new SpeechRecognition();
+          recognitionInstance.continuous = false;
+          recognitionInstance.interimResults = false;
+          recognitionInstance.lang = 'en-US';
+
+          recognitionInstance.onstart = () => {
+            console.log('Speech recognition started');
+            setIsListening(true);
+          };
+
+          recognitionInstance.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setQuery(transcript);
+            setIsListening(false);
+            fetchMovies(transcript);
+          };
+
+          recognitionInstance.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+            if (event.error === 'not-allowed') {
+              setError('Please allow microphone access to use voice search.');
+            } else {
+              setError('Speech recognition error. Please try again.');
+            }
+          };
+
+          recognitionInstance.onend = () => {
+            setIsListening(false);
+          };
+
+          setRecognition(recognitionInstance);
+        }
+      } catch (err) {
+        console.error('Failed to initialize speech recognition:', err);
+        setError('Speech recognition initialization failed. Please try again.');
+      }
+    };
+
+    initializeSpeechRecognition();
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognition) {
+      setError('Speech recognition is not supported in your browser.');
+      return;
+    }
+
+    if (isListening) {
+      recognition.stop();
+    } else {
+      setError(null);
+      try {
+        recognition.start();
+      } catch (err) {
+        console.error('Speech recognition error:', err);
+        setError('Error starting speech recognition. Please try again.');
+      }
+    }
+  };
+
+  const fetchMovies = async (searchQuery = query) => {
+    if (!searchQuery) return;
     setLoading(true);
     setError(null);
 
@@ -27,7 +103,7 @@ const Search = () => {
         {
           params: {
             api_key: API_KEY,
-            query: query,
+            query: searchQuery,
             language: 'en-US',
             page: 1,
             with_original_language: 'en',
@@ -51,11 +127,6 @@ const Search = () => {
     fetchMovies();
   };
 
-
-  const isFavorite = (movie) => {
-    return favorites.some(fav => fav.id === movie.id); 
-  };
-
   return (
     <div className="min-h-screen bg-gray-900">
       <button
@@ -69,17 +140,31 @@ const Search = () => {
           <h2 className="text-4xl font-bold text-white">Search Movies</h2>
         </div>
 
-        <form onSubmit={handleSearch} className="mb-8">
-          <input
-            type="text"
-            placeholder="Search for a movie..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="px-4 py-2 w-full max-w-md rounded-lg bg-gray-700 text-white"
-          />
+        <form onSubmit={handleSearch} className="mb-8 flex items-center">
+          <div className="relative flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder={isListening ? 'Listening...' : 'Search for a movie...'}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="px-4 py-2 w-full rounded-lg bg-gray-700 text-white pr-12"
+            />
+            <button
+              type="button"
+              onClick={toggleListening}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-white transition-colors"
+              title={isListening ? 'Stop listening' : 'Start voice search'}
+            >
+              {isListening ? (
+                <Mic className="w-5 h-5 text-blue-500 animate-pulse" />
+              ) : (
+                <MicOff className="w-5 h-5" />
+              )}
+            </button>
+          </div>
           <button
             type="submit"
-            className="px-4 ml-2 py-2 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="px-4 ml-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             Search
           </button>
@@ -126,7 +211,6 @@ const Search = () => {
                     >
                       Watch Now
                     </button>
-                    
                   </div>
                 </div>
               </div>
