@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Mic, MicOff } from 'lucide-react';
+import Nav from './Nav'
 
 const Search = () => {
   const [query, setQuery] = useState('');
@@ -129,6 +130,7 @@ const Search = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
+      <Nav />
       <button
         onClick={() => navigate("/movie")}
         className="m-4 gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"

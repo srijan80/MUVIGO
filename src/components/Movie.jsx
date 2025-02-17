@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Nav from "./Nav";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, Star, Info, Heart, LogOut } from "lucide-react";
 
@@ -166,7 +167,9 @@ export default function Movie() {
   };
 
   return (
+    
     <div className="min-h-screen bg-gray-900">
+      <Nav />
       <div className="container mx-auto py-12 px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-4xl font-bold text-white">
