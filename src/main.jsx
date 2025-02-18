@@ -8,6 +8,8 @@ import MoviePage from './components/Movie';
 import ProtectedRoute from './components/ProtectedRoute';  
 import Fav from './components/Fav';
 import Search from './components/Search';
+import Music from './components/Music';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -17,6 +19,7 @@ root.render(
         <Route path="/" element={<Login />} />
         <Route path="/Search" element={<Search />} />
         <Route path="/Favorites" element={<Fav />} />
+        <Route path="/Music" element={<Music />} />
         <Route
           path="/movie"
           element={
