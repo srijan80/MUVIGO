@@ -96,14 +96,14 @@ export default function Cpassword() {
         confirmPassword: ""
       });
 
-      // Important: Don't update the token here, just clear it
-      localStorage.removeItem("token");
-      delete axios.defaults.headers.common['Authorization'];
+      // // Important: Don't update the token here, just clear it
+      // localStorage.removeItem("token");
+      // delete axios.defaults.headers.common['Authorization'];
 
       // Redirect after success message
       setTimeout(() => {
-        navigate("/");
-      }, 2000);
+        navigate("/movie");
+      }, 700);
 
     } catch (error) {
       if (error.response?.status === 400) {
@@ -145,20 +145,7 @@ export default function Cpassword() {
           {success && (
             <div className="bg-green-500 text-white p-4 rounded-lg mb-6">
               <p className="mb-2">Password changed successfully!</p>
-              <p className="text-sm">You'll be redirected automatically, or you can:</p>
               <div className="mt-3 flex gap-3">
-                <button 
-                  onClick={() => navigate("/movie")}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Continue
-                </button>
-                <button 
-                  onClick={handleLogout}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                >
-                  Logout to Test
-                </button>
               </div>
             </div>
           )}
