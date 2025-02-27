@@ -96,19 +96,25 @@ export default function Movie() {
         return;
       }
   
-      const response = await axios.delete("http://localhost:5000/api/users", {
-        headers: { Authorization: `Bearer ${token}` }
+      await axios.delete("http://localhost:5000/api/users", {
+        headers: { 
+          Authorization: `Bearer ${token}`
+        }
       });
   
-      console.log("Delete response:", response.data);
-  
-      // Clear token and navigate to login page
-      localStorage.removeItem("token");
+      // Clear all local storage
+      localStorage.clear();
+      
+      // Reset states
       setShowDeleteConfirm(false);
+      setError(null);
+      
+      // Navigate to login page
       navigate("/");
     } catch (error) {
-      console.error("Failed to delete account:", error.response?.data || error.message);
-      setError("Failed to delete account: " + (error.response?.data?.message || error.message));
+      console.error('Failed to delete account:', error);
+      const errorMessage = error.response?.data?.message || error.message;
+      setError(`Failed to delete account: ${errorMessage}`);
       setShowDeleteConfirm(false);
     }
   };

@@ -135,6 +135,33 @@ app.put('/api/users/password', verifyToken, async (req, res) => {
   }
 });
 
+
+// Delete user route
+app.delete('/api/users', verifyToken, async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    // Find and delete the user
+    const deletedUser = await User.findByIdAndDelete(userId);
+    
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    res.json({ message: 'User account deleted successfully.' });
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({ message: 'Error deleting account. Please try again.' });
+  }
+});
+
+
+
+
+
+
 // Middleware to verify JWT
 function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -152,6 +179,8 @@ function verifyToken(req, res, next) {
     res.status(400).json({ message: 'Invalid token' });
   }
 }
+
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
