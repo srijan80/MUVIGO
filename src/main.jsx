@@ -9,6 +9,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Fav from './components/Fav';
 import Search from './components/Search';
 import Music from './components/Music';
+import Cpassword from './components/Cpassword';
+
+
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -20,6 +23,8 @@ root.render(
         <Route path="/Search" element={<Search />} />
         <Route path="/Favorites" element={<Fav />} />
         <Route path="/Music" element={<Music />} />
+        <Route path="/change-password" element={<Cpassword />} />
+
         <Route
           path="/movie"
           element={

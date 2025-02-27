@@ -9,12 +9,10 @@ const port = 5000;
 const JWT_SECRET = 'your-secret-key'; 
 const MONGODB_URI = 'mongodb://localhost:27017/movieapp'; 
 
-
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
-
-
+  
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -34,25 +32,12 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-
 const User = mongoose.model('User', userSchema);
-
 
 app.use(cors());
 app.use(express.json());
 
-
+// Signup route
 app.post('/api/signup', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,8 +48,15 @@ app.post('/api/signup', async (req, res) => {
       return res.status(400).json({ message: 'User already exists. Please login.' });
     }
 
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create new user
-    const user = new User({ email, password });
+    const user = new User({ 
+      email, 
+      password: hashedPassword 
+    });
     await user.save();
 
     // Create JWT token
@@ -87,14 +79,19 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found. Please sign up.' });
     }
 
-    // Compare password
+    // Compare password using bcrypt
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(400).json({ message: 'Invalid password. Please try again.' });
     }
 
-    // Create JWT token
-    const token = jwt.sign({ email: user.email, userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    // Create new token
+    const token = jwt.sign(
+      { email: user.email, userId: user._id }, 
+      JWT_SECRET, 
+      { expiresIn: '1h' }
+    );
+
     res.json({ token });
   } catch (error) {
     console.error('Login error:', error);
@@ -102,9 +99,40 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Protected route example
-app.get('/api/verify', verifyToken, (req, res) => {
-  res.json({ message: 'Verified user', user: req.user });
+// Update the password change route
+app.put('/api/users/password', verifyToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.userId;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Verify current password
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isValidPassword) {
+      return res.status(400).json({ message: 'Current password is incorrect.' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    user.password = hashedPassword;
+    await user.save();
+
+    // Don't send a new token, just acknowledge the change
+    res.json({ 
+      message: 'Password updated successfully. Please login with your new password.'
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ message: 'Error changing password. Please try again.' });
+  }
 });
 
 // Middleware to verify JWT
@@ -118,7 +146,7 @@ function verifyToken(req, res, next) {
 
   try {
     const verified = jwt.verify(token, JWT_SECRET);
-    req.user = verified;
+    req.user = verified; // This should contain userId
     next();
   } catch (err) {
     res.status(400).json({ message: 'Invalid token' });

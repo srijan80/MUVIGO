@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -8,53 +9,49 @@ const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   
-
-useEffect(() => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    navigate('/movie');
-  }
-}, [navigate]);
-
-
   useEffect(() => {
+    // Clear any existing auth data on component mount
     const token = localStorage.getItem('token');
     if (token) {
       navigate('/movie');
+    } else {
+      delete axios.defaults.headers.common['Authorization'];
     }
   }, [navigate]);
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
-   
+  
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
       setIsLoading(false);
       return;
     }
-
+  
     try {
+      delete axios.defaults.headers.common['Authorization'];
+      
       const endpoint = isLogin ? '/api/login' : '/api/signup';
       const response = await axios.post(`http://localhost:5000${endpoint}`, {
         email,
         password,
       });
-
-    
-      localStorage.setItem('token', response.data.token);
-      
-      
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
- 
-      setEmail('');
-      setPassword('');
- 
-      navigate('/movie');
+  
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+  
+        setEmail('');
+        setPassword('');
+        navigate('/movie');
+      } else {
+        throw new Error('No token received from server');
+      }
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -64,7 +61,6 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
-
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setError('');
@@ -87,9 +83,7 @@ useEffect(() => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-300">Email</label>
             <input
               type="email"
               className="w-full p-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -101,29 +95,32 @@ useEffect(() => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300">
-              Password
-            </label>
-            <input
-              type="password"
-              className="w-full p-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-              minLength={6}
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Must be at least 6 characters long
-            </p>
+            <label className="block text-sm font-medium text-gray-300">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="w-full p-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-gray-400 hover:text-white"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">Must be at least 6 characters long</p>
           </div>
           <button
             type="submit"
             className={`w-full py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              isLoading
-                ? 'bg-blue-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
+              isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
             }`}
             disabled={isLoading}
           >

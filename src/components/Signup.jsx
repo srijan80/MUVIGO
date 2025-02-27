@@ -1,18 +1,40 @@
 import { useState } from "react";
-import { auth } from "./firebase"; 
 
 function Signup({ onSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+    
     try {
-      await auth.createUserWithEmailAndPassword(email, password);
-      onSuccess(); 
+      const response = await fetch('http://localhost:5000/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Signup failed');
+      }
+      
+      // Store the token in localStorage for future authenticated requests
+      localStorage.setItem('token', data.token);
+      
+      // Call the success callback
+      onSuccess();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,8 +55,10 @@ function Signup({ onSuccess }) {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {error && <div>{error}</div>}
-        <button type="submit">Sign Up</button>
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        <button type="submit" disabled={loading}>
+          {loading ? 'Signing up...' : 'Sign Up'}
+        </button>
       </form>
     </div>
   );

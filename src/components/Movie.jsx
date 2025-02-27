@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Nav from "./Nav";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, Star, Info, Heart, LogOut } from "lucide-react";
+import { Calendar, Clock, Star, Info, Heart, LogOut, UserX, Key } from "lucide-react";
 
 export default function Movie() {
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ export default function Movie() {
   const [error, setError] = useState(null);
   const [selectedMood, setSelectedMood] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const moods = [
     {
@@ -73,12 +74,48 @@ export default function Movie() {
     if (!token) {
       navigate("/");
     }
+
+    // Load favorites from localStorage
+    const storedFavorites = JSON.parse(localStorage.getItem("favoriteMovies")) || [];
+    setFavorites(new Set(storedFavorites.map(fav => fav.id)));
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     delete axios.defaults.headers.common["Authorization"];
     navigate("/");
+  };
+
+
+
+  const handleDeleteAccount = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/");
+        return;
+      }
+  
+      const response = await axios.delete("http://localhost:5000/api/users", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      console.log("Delete response:", response.data);
+  
+      // Clear token and navigate to login page
+      localStorage.removeItem("token");
+      setShowDeleteConfirm(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to delete account:", error.response?.data || error.message);
+      setError("Failed to delete account: " + (error.response?.data?.message || error.message));
+      setShowDeleteConfirm(false);
+    }
+  };
+
+
+  const handleChangePassword = () => {
+    navigate("/change-password");
   };
 
   const fetchMovies = async (mood) => {
@@ -167,28 +204,45 @@ export default function Movie() {
   };
 
   return (
-    
     <div className="min-h-screen bg-gray-900">
       <Nav />
+      
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg max-w-md mx-4">
+            <h3 className="text-xl font-bold text-white mb-4">Delete Account</h3>
+            <p className="text-gray-300 mb-6">Are you sure you want to delete your account? This action cannot be undone.</p>
+            <div className="flex justify-end gap-4">
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteAccount}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="container mx-auto py-12 px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-4xl font-bold text-white">
-            What's Your Mood Today? {selectedMood?.icon}
-          </h2>
-
-          <div className="flex gap-4">
 
 
-          <button
+      <div className="flex gap-4">
+            <button
               onClick={() => navigate("/Music")}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               Music
             </button>
 
-
-
-          <button
+            <button
               onClick={() => navigate("/Search")}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
@@ -203,14 +257,37 @@ export default function Movie() {
             </button>
 
             <button
-              onClick={handleLogout}
+              onClick={handleChangePassword}
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+            >
+              <Key className="w-4 h-4" />
+              Change Password
+            </button>
+
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
             >
-              {" "}
+              <UserX className="w-4 h-4" />
+              Delete Account
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+            >
               <LogOut className="w-4 h-4" />
               Logout
             </button>
           </div>
+
+
+        <div className="flex pt-4 justify-between items-center mb-8">
+          <h2 className="text-4xl font-bold text-white">
+            What's Your Mood Today? {selectedMood?.icon}
+          </h2>
+
+          
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
@@ -316,9 +393,9 @@ export default function Movie() {
                           viewBox="0 0 24 24"
                         >
                           <path
-                            fill-rule="evenodd"
+                            fillRule="evenodd"
                             d="M8.6 5.2A1 1 0 0 0 7 6v12a1 1 0 0 0 1.6.8l8-6a1 1 0 0 0 0-1.6l-8-6Z"
-                            clip-rule="evenodd"
+                            clipRule="evenodd"
                           />
                         </svg>
                         Watch Now
@@ -351,8 +428,6 @@ export default function Movie() {
                 </div>
               </div>
             ))}
-
-
           </div>
         )}
       </div>
