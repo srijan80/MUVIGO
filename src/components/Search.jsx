@@ -20,12 +20,12 @@ const Search = () => {
   useEffect(() => {
     const initializeSpeechRecognition = async () => {
       try {
-        // Try to load the polyfill if native speech recognition is not available
+      
         if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
           await import('https://cdnjs.cloudflare.com/ajax/libs/speech-recognition-polyfill/0.5.0/speech-recognition-polyfill.min.js');
         }
 
-        // Get the appropriate speech recognition constructor
+        
         const SpeechRecognition = 
           window.SpeechRecognition || 
           window.webkitSpeechRecognition || 

@@ -75,7 +75,7 @@ export default function Movie() {
       navigate("/");
     }
 
-    // Load favorites from localStorage
+
     const storedFavorites = JSON.parse(localStorage.getItem("favoriteMovies")) || [];
     setFavorites(new Set(storedFavorites.map(fav => fav.id)));
   }, [navigate]);
@@ -102,14 +102,14 @@ export default function Movie() {
         }
       });
   
-      // Clear all local storage
+      
       localStorage.clear();
       
-      // Reset states
+     
       setShowDeleteConfirm(false);
       setError(null);
       
-      // Navigate to login page
+      
       navigate("/");
     } catch (error) {
       console.error('Failed to delete account:', error);
@@ -213,7 +213,7 @@ export default function Movie() {
     <div className="min-h-screen bg-gray-900">
       <Nav />
       
-      {/* Delete Account Confirmation Modal */}
+  
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-800 p-6 rounded-lg max-w-md mx-4">

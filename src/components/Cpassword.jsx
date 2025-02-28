@@ -21,7 +21,7 @@ export default function Cpassword() {
   });
 
   useEffect(() => {
-    // Check if user is logged in
+   
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/");
@@ -34,7 +34,7 @@ export default function Cpassword() {
       [e.target.name]: e.target.value
     });
     
-    // Clear error when user starts typing again
+   
     if (error) {
       setError(null);
     }
@@ -52,14 +52,14 @@ export default function Cpassword() {
     setLoading(true);
     setError(null);
     
-    // Validate passwords match
+  
     if (formData.newPassword !== formData.confirmPassword) {
       setError("New passwords do not match");
       setLoading(false);
       return;
     }
 
-    // Validate password length
+
     if (formData.newPassword.length < 6) {
       setError("Password must be at least 6 characters long");
       setLoading(false);
@@ -72,12 +72,12 @@ export default function Cpassword() {
         throw new Error("Not authenticated");
       }
 
-      // Configure headers with token
+  
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
 
-      // Call the change password API
+
       const response = await axios.put(
         "http://localhost:5000/api/users/password", 
         {
@@ -89,18 +89,14 @@ export default function Cpassword() {
 
       setSuccess(true);
 
-      // Reset form
+     
       setFormData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: ""
       });
 
-      // // Important: Don't update the token here, just clear it
-      // localStorage.removeItem("token");
-      // delete axios.defaults.headers.common['Authorization'];
-
-      // Redirect after success message
+  
       setTimeout(() => {
         navigate("/movie");
       }, 700);
@@ -121,10 +117,10 @@ export default function Cpassword() {
     }
   };
 
-  // Function to handle logout for testing
+
   const handleLogout = () => {
     localStorage.removeItem("token");
-    // Clear axios headers when logging out
+
     delete axios.defaults.headers.common['Authorization'];
     navigate("/");
   };

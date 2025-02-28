@@ -13,7 +13,6 @@ const Login = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Clear any existing auth data on component mount
     const token = localStorage.getItem('token');
     if (token) {
       navigate('/movie');

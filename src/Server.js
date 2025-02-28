@@ -37,29 +37,29 @@ const User = mongoose.model('User', userSchema);
 app.use(cors());
 app.use(express.json());
 
-// Signup route
+
 app.post('/api/signup', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user already exists
+ 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists. Please login.' });
     }
 
-    // Hash password
+   
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
+
     const user = new User({ 
       email, 
       password: hashedPassword 
     });
     await user.save();
 
-    // Create JWT token
+
     const token = jwt.sign({ email: user.email, userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
     res.status(201).json({ token });
   } catch (error) {
@@ -68,24 +68,24 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-// Login route
+
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'User not found. Please sign up.' });
     }
 
-    // Compare password using bcrypt
+
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(400).json({ message: 'Invalid password. Please try again.' });
     }
 
-    // Create new token
+  
     const token = jwt.sign(
       { email: user.email, userId: user._id }, 
       JWT_SECRET, 
@@ -99,33 +99,33 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Update the password change route
+
 app.put('/api/users/password', verifyToken, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.userId;
 
-    // Find user
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Verify current password
+ 
     const isValidPassword = await bcrypt.compare(currentPassword, user.password);
     if (!isValidPassword) {
       return res.status(400).json({ message: 'Current password is incorrect.' });
     }
 
-    // Hash new password
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Update password
+    
     user.password = hashedPassword;
     await user.save();
 
-    // Don't send a new token, just acknowledge the change
+  
     res.json({ 
       message: 'Password updated successfully. Please login with your new password.'
     });
@@ -136,14 +136,14 @@ app.put('/api/users/password', verifyToken, async (req, res) => {
 });
 
 
-// Delete user route
+
 app.delete('/api/users', verifyToken, async (req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
 
-    // Find and delete the user
+
     const deletedUser = await User.findByIdAndDelete(userId);
     
     if (!deletedUser) {
@@ -160,9 +160,6 @@ app.delete('/api/users', verifyToken, async (req, res) => {
 
 
 
-
-
-// Middleware to verify JWT
 function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -173,7 +170,7 @@ function verifyToken(req, res, next) {
 
   try {
     const verified = jwt.verify(token, JWT_SECRET);
-    req.user = verified; // This should contain userId
+    req.user = verified; 
     next();
   } catch (err) {
     res.status(400).json({ message: 'Invalid token' });

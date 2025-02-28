@@ -26,10 +26,9 @@ function Signup({ onSuccess }) {
         throw new Error(data.message || 'Signup failed');
       }
       
-      // Store the token in localStorage for future authenticated requests
+     
       localStorage.setItem('token', data.token);
-      
-      // Call the success callback
+  
       onSuccess();
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');

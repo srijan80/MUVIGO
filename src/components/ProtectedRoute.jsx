@@ -12,6 +12,4 @@ const ProtectedRoute = ({ children }) => {
 
 export default ProtectedRoute;
 
-{/* <ProtectedRoute path="/movie">
-  <MoviePage />
-</ProtectedRoute> */}
+
